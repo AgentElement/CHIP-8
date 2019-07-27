@@ -105,25 +105,25 @@ int exec(chip8* c8, opcode inst)
 
         case 0x4: // 0x8XY4: add VX, VY
             uint16_t result = c8->V[byte_1] + c8->V[byte_2];
-            c8->V[16] = (result >> 8) & 0x1;
+            c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
 
         case 0x5: // 0x8XY5: sub VX, VY
             int16_t result = c8->V[byte_2] - c8->V[byte_1];
-            c8->V[16] = (result >> 8) & 0x1;
+            c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
 
         case 0x6: // 0x8XY6: shr VX {, VY}
-            c8->V[16] = c8->V[byte_1] & 0x0001;
+            c8->V[0xF] = c8->V[byte_1] & 0x0001;
             c8->V[byte_1] >>= 1;
 
         case 0x7: // 0x8XY7: subn VX, VY
             int16_t result = c8->V[byte_1] - c8->V[byte_2];
-            c8->V[16] = (result >> 8) & 0x1;
+            c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
 
         case 0xE: // 0x8XYE: shl VX {, VY}
-            c8->V[16] = (c8->V[byte_1] >> 7) & 0x1;
+            c8->V[0xF] = (c8->V[byte_1] >> 7) & 0x1;
             c8->V[byte_1] <<= 1;
         }
 
