@@ -12,7 +12,7 @@ typedef struct {
     /*
     * General-purpose registers: V0 to VF.
     * VF is used as a flag by some operations.
-    */ 
+    */
     uint8_t V[16];
 
     uint16_t stack[16];
@@ -64,119 +64,162 @@ int exec(chip8* c8, opcode inst)
         } else if (inst == 0x00EE) { // 0x00EE: ret
             // return
         }
+        break;
 
     case 0x1: // 0x1NNN: jp addr
         c8->PC = inst & 0x0FFF;
+        break;
 
-    case 0x2: // 0x2NNN: ret
-        // call NNN
+    case 0x2: // 0x2NNN: call nnn
+        c8->stack[c8->SP] = c8->PC;
+        c8->SP++;
+        c8->PC = inst & 0x0FFF;
+        break;
 
     case 0x3: // 0x3XNN: se VX, byte
         if (c8->V[byte_1] == (cbyte_1))
             c8->PC += 2;
+        break;
 
     case 0x4: // 0x4XNN: sne VX, byte
         if (c8->V[byte_1] != (cbyte_1))
             c8->PC += 2;
+        break;
 
     case 0x5: // 0x5XY0: se VX, VY
         if (c8->V[byte_1] == c8->V[byte_2])
             c8->PC += 2;
+        break;
 
     case 0x6: // 0x6XNN: ld VX, byte
         c8->V[byte_1] = (cbyte_1);
+        break;
 
     case 0x7: // 0x7XNN: add VX, byte
         c8->V[byte_1] += (cbyte_1);
+        break;
 
     case 0x8:
         switch (inst & 0x000F) {
         case 0x0: // 0x8XY0: ld VX, VY
             c8->V[byte_1] = c8->V[byte_2];
+            break;
 
         case 0x1: // 0x8XY1: or VX, VY
             c8->V[byte_1] |= c8->V[byte_2];
+            break;
 
         case 0x2: // 0x8XY2: and VX, VY
             c8->V[byte_1] &= c8->V[byte_2];
+            break;
 
         case 0x3: // 0x8XY3: xor VX, VY
             c8->V[byte_1] ^= c8->V[byte_2];
+            break;
 
         case 0x4: // 0x8XY4: add VX, VY
             uint16_t result = c8->V[byte_1] + c8->V[byte_2];
             c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
+            break;
 
         case 0x5: // 0x8XY5: sub VX, VY
             int16_t result = c8->V[byte_2] - c8->V[byte_1];
             c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
+            break;
 
         case 0x6: // 0x8XY6: shr VX {, VY}
             c8->V[0xF] = c8->V[byte_1] & 0x0001;
             c8->V[byte_1] >>= 1;
+            break;
 
         case 0x7: // 0x8XY7: subn VX, VY
             int16_t result = c8->V[byte_1] - c8->V[byte_2];
             c8->V[0xF] = (result >> 8) & 0x1;
             c8->V[byte_1] = (uint8_t)result;
+            break;
 
         case 0xE: // 0x8XYE: shl VX {, VY}
             c8->V[0xF] = (c8->V[byte_1] >> 7) & 0x1;
             c8->V[byte_1] <<= 1;
+            break;
         }
+        break;
 
     case 0x9: // 9XY0: sne VX, VY
         if (c8->V[byte_1] != c8->V[byte_2])
             c8->PC += 2;
+        break;
 
     case 0xA: // ANNN: ld I, addr
         c8->I = (inst & 0x0FFF);
+        break;
 
     case 0xB: // BNNN: jp V0, addr
         c8->PC = (inst & 0x0FFF) + c8->V[0];
+        break;
 
     case 0xC: // CXNN: rnd VX, byte
         c8->V[byte_1] = (rand() % 0x100) & (cbyte_1);
+        break;
 
     case 0xD: // DXYN: drw VX, VY, nibble
         // display(Vx, Vy n);
 
     case 0xE:
-        if ((cbyte_1) == 0x009E) { // EX9E: skp Vx
+        if (cbyte_1 == 0x009E) { // EX9E: skp Vx
             if (c8->keyState[c8->V[byte_1]])
                 c8->PC += 2;
-        } else if ((cbyte_1) == 0x00A1) { // EXA1: skp Vx
+        } else if (cbyte_1 == 0x00A1) { // EXA1: skp Vx
             if (!c8->keyState[c8->V[byte_1]])
                 c8->PC += 2;
         }
+        break;
 
     case 0xF:
         switch (cbyte_1) {
         case (0x07): // FX07: ld VX, DT
             c8->V[byte_1] = c8->DT;
+            break;
 
         case (0x0A): // FX0A: kld VX
             c8->V[byte_1] = readKey(c8);
+            break;
 
         case (0x15): // FX15: ld DT, VX
             c8->DT = c8->V[byte_1];
+            break;
 
         case (0x18): // FX18: ld ST, VX
             c8->ST = c8->V[byte_1];
+            break;
 
         case (0x1E): // FX1E: add I, VX
             c8->I += c8->V[byte_1];
+            break;
 
         case (0x29): // FX29: ld F, VX
             c8->I = c8->V[byte_1] * 5;
+            break;
 
         case (0x33): // FX55: bcd Vx
+            c8->memory[c8->I] = byte_1 / 100;
+            c8->memory[c8->I + 1] = byte_1 % 100;
+            c8->memory[c8->I + 2] = byte_1 % 10;
+            break;
 
         case (0x55): // FX55: rdmp VX
+            for (uint8_t i = 0; i < byte_1; i++) {
+                c8->memory[c8->I + i] = c8->V[i];
+            }
+            break;
 
         case (0x65): // FX65: rrcl VX
+            for (uint8_t i = 0; i < byte_1; i++) {
+                c8->V[i] = c8->memory[c8->I + i];
+            }
+            break;
         }
     }
     c8->PC += 2;
