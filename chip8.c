@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #ifdef _WIN32
-// #include <windows.h>
-// #endif // _WIN32
-
 typedef uint16_t opcode;
 
 typedef struct {
@@ -60,9 +56,15 @@ int exec(chip8* c8, opcode inst)
     switch (op_id) {
     case 0x0:
         if (inst == 0x00E0) { // 0x00E0: cls
-            clear_screen(c8);
+            for (size_t x = 0; x < 64; x++) {
+                for (size_t y = 0; y < 32; y++) {
+                    c8->screen[x][y] = 0;
+                }
+            }
+
         } else if (inst == 0x00EE) { // 0x00EE: ret
-            // return
+            c8->SP--;
+            c8->PC = c8->stack[c8->SP];
         }
         break;
 
@@ -71,18 +73,18 @@ int exec(chip8* c8, opcode inst)
         break;
 
     case 0x2: // 0x2NNN: call nnn
-        c8->stack[c8->SP] = c8->PC;
+        c8->stack[c8->SP] = c8->PC + 2;
         c8->SP++;
         c8->PC = inst & 0x0FFF;
         break;
 
     case 0x3: // 0x3XNN: se VX, byte
-        if (c8->V[byte_1] == (cbyte_1))
-            c8->PC += 2;
-        break;
+        if (c8->V[byte_1] == cbyte_1)
+
+            break;
 
     case 0x4: // 0x4XNN: sne VX, byte
-        if (c8->V[byte_1] != (cbyte_1))
+        if (c8->V[byte_1] != cbyte_1)
             c8->PC += 2;
         break;
 
@@ -92,11 +94,11 @@ int exec(chip8* c8, opcode inst)
         break;
 
     case 0x6: // 0x6XNN: ld VX, byte
-        c8->V[byte_1] = (cbyte_1);
+        c8->V[byte_1] = cbyte_1;
         break;
 
     case 0x7: // 0x7XNN: add VX, byte
-        c8->V[byte_1] += (cbyte_1);
+        c8->V[byte_1] += cbyte_1;
         break;
 
     case 0x8:
@@ -153,7 +155,7 @@ int exec(chip8* c8, opcode inst)
         break;
 
     case 0xA: // ANNN: ld I, addr
-        c8->I = (inst & 0x0FFF);
+        c8->I = inst & 0x0FFF;
         break;
 
     case 0xB: // BNNN: jp V0, addr
@@ -161,7 +163,7 @@ int exec(chip8* c8, opcode inst)
         break;
 
     case 0xC: // CXNN: rnd VX, byte
-        c8->V[byte_1] = (rand() % 0x100) & (cbyte_1);
+        c8->V[byte_1] = (rand() % 0x100) & cbyte_1;
         break;
 
     case 0xD: // DXYN: drw VX, VY, nibble
@@ -231,8 +233,6 @@ int load(chip8* c8)
         c8->memory[i] = sprites[i];
     }
 }
-
-int clear_screen(chip8* c8);
 
 int update_keys(chip8* c8);
 
