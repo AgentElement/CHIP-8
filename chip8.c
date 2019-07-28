@@ -1,29 +1,7 @@
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef uint16_t opcode;
-
-typedef struct {
-    /*
-    * General-purpose registers: V0 to VF.
-    * VF is used as a flag by some operations.
-    */
-    uint8_t V[16];
-
-    uint16_t stack[16];
-    uint8_t keyState[16];
-
-    uint16_t I; // Instruction pointer
-    uint8_t SP; // Stack pointer
-    uint16_t PC; // Program counter
-    uint8_t DT; // Delay timer
-    uint8_t ST; // Sound timer
-
-    uint8_t screen[64][32];
-    uint8_t memory[4096];
-
-} chip8;
+#include "chip8.h"
 
 uint8_t sprites[80] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -80,7 +58,7 @@ int exec(chip8* c8, opcode inst)
 
     case 0x3: // 0x3XNN: se VX, byte
         if (c8->V[byte_1] == cbyte_1)
-
+            c8->PC += 2;
             break;
 
     case 0x4: // 0x4XNN: sne VX, byte
