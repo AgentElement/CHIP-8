@@ -21,9 +21,12 @@ typedef struct {
     uint8_t DT; // Delay timer
     uint8_t ST; // Sound timer
 
-    uint8_t screen[64][32];
+    uint8_t screen[2048];
     uint8_t memory[4096];
 
 } chip8;
+
+int exec(chip8* c8, opcode inst);
+int load(chip8* c8, FILE* file);
 
 #endif // CHIP8_H
