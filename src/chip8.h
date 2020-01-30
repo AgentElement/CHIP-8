@@ -2,6 +2,7 @@
 #define CHIP8_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 typedef uint16_t opcode;
 

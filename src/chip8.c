@@ -277,8 +277,4 @@ int load(chip8* c8, FILE* file)
     return 0;
 }
 
-int update_keys(chip8* c8);
 
-uint8_t readKey(chip8* c8)
-{
-}

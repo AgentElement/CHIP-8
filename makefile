@@ -1,16 +1,24 @@
-CC=gcc -g
+CC=gcc
+LIBS=-lGL -lGLU -lglfw3 -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor -lm
+IDIR=include
+ODIR=obj
+SRC=src
 
-chip8.o: src/chip8.c src/chip8.h
-	$(CC) -c src/chip8.c -o chip8.o
+CFLAGS=-g -I$(IDIR)
 
-chip8: chip8.o
-	$(CC) chip8.o -o chip8 
+_DEPS = glad/glad.c
+DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 
-c8test.o: src/tests.c src/chip8.h
-	$(CC) -c src/tests.c -o c8test.o 
+_OBJ = display.o chip8.o main.o
+OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
-c8test: chip8.o c8test.o
-	$(CC) chip8.o c8test.o -o c8test
+$(ODIR)/%.o: $(SRC)/%.c
+	$(CC) -c $^ -o $@ $(CFLAGS)
+
+chip8test: $(OBJ)
+	$(CC) $^ $(DEPS) -o $@ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
 
 clean:
-	rm -f *.o c8test chip8
+	rm -f $(ODIR)/*.o chip8test	
