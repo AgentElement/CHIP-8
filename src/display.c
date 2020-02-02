@@ -1,5 +1,4 @@
 #include "display.h"
-
 GLFWwindow* createWindow()
 {
     glfwSetErrorCallback(error_callback);
@@ -171,6 +170,78 @@ key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         // Quit if esc is pressed
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    if (action == GLFW_PRESS) {
+
+        switch (key) {
+        case GLFW_KEY_1:
+            KEY_VAL = 0x0;
+            break;
+
+        case GLFW_KEY_2:
+            KEY_VAL = 0x1;
+            break;
+
+        case GLFW_KEY_3:
+            KEY_VAL = 0x2;
+            break;
+
+        case GLFW_KEY_4:
+            KEY_VAL = 0x3;
+            break;
+
+        case GLFW_KEY_Q:
+            KEY_VAL = 0x4;
+            break;
+
+        case GLFW_KEY_W:
+            KEY_VAL = 0x5;
+            break;
+
+        case GLFW_KEY_E:
+            KEY_VAL = 0x6;
+            break;
+
+        case GLFW_KEY_R:
+            KEY_VAL = 0x7;
+            break;
+
+        case GLFW_KEY_A:
+            KEY_VAL = 0x8;
+            break;
+
+        case GLFW_KEY_S:
+            KEY_VAL = 0x9;
+            break;
+
+        case GLFW_KEY_D:
+            KEY_VAL = 0xA;
+            break;
+
+        case GLFW_KEY_F:
+            KEY_VAL = 0xB;
+            break;
+
+        case GLFW_KEY_Z:
+            KEY_VAL = 0xC;
+            break;
+
+        case GLFW_KEY_X:
+            KEY_VAL = 0xD;
+            break;
+
+        case GLFW_KEY_C:
+            KEY_VAL = 0xE;
+            break;
+
+        case GLFW_KEY_V:
+            KEY_VAL = 0xF;
+            break;
+        }
+    }
+    if (action == GLFW_RELEASE) {
+        KEY_VAL = -1;
+    }
 }
 
 static void
@@ -179,4 +250,3 @@ framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
-

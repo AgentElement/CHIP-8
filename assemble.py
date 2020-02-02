@@ -14,6 +14,9 @@ class Assembler:
             line = infile.readline()
             while line:
                 opcode = re.sub(r'#.*', '', line).strip()
+                if opcode == '':
+                    line = infile.readline()
+                    continue
                 outfile.write(bytes.fromhex(opcode))
                 line = infile.readline()
 

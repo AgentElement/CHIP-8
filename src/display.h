@@ -10,10 +10,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_X 64
-#define MAX_Y 32
+#include "chip8.h"
 
 uint32_t ACTIVE_DISPLAY_PIXELS;
+
+
+int8_t KEY_VAL;
+
 
 void loadVertices(float* vertices);
 

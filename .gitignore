@@ -3,3 +3,7 @@
 venv/
 .idea/
 *.o
+src/tests*
+*.json
+chip8test
+roms/*

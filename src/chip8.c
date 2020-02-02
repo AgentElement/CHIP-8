@@ -9,9 +9,9 @@ uint8_t sprites[80] = {
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
     0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
     0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-    0x50, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
     0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 7
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
     0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
     0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
     0xF0, 0x90, 0xF0, 0x90, 0x90, // A
@@ -148,14 +148,17 @@ int exec(chip8* c8, opcode inst)
         uint8_t byte_3 = inst & 0x000F;
         c8->V[0xF] = 0;
         for (uint8_t i = 0; i < byte_3; i++) {
+            uint8_t sprite_byte = c8->memory[c8->I + i];
             for (uint8_t j = 0; j < 8; j++) {
-                uint8_t pixel = c8->screen[64 * (byte_2 + i) + byte_1 + j];
-                if (!c8->V[0xF] && pixel) {
+                uint8_t sprite_bit = (sprite_byte >> (7 - j)) & 1;
+                uint8_t* pixel = &c8->screen[(MAX_X * ((c8->V[byte_2] + i) % MAX_Y)) + ((c8->V[byte_1] + j) % MAX_X)];
+                if (sprite_bit && *pixel) {
                     c8->V[0xF] = 1;
                 }
-                pixel ^= 1;
+                *pixel ^= sprite_bit;
             }
         }
+        c8->DF = 1;
     } break;
 
     case 0xE:
@@ -238,7 +241,7 @@ long getFileSize(FILE* file)
     return size;
 
     if (size > 0xE00) {
-        fprintf(stderr, "File too large.");
+        fprintf(stderr, "File too large.\n");
         return -1;
     }
 }
@@ -277,4 +280,12 @@ int load(chip8* c8, FILE* file)
     return 0;
 }
 
-
+void update_timers(chip8* c8)
+{
+    if (c8->DT > 0) {
+        c8->DT--;
+    }
+    if (c8->ST > 0) {
+        c8->ST--;
+    }
+}
