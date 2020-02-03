@@ -175,19 +175,19 @@ key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 
         switch (key) {
         case GLFW_KEY_1:
-            KEY_VAL = 0x0;
-            break;
-
-        case GLFW_KEY_2:
             KEY_VAL = 0x1;
             break;
 
-        case GLFW_KEY_3:
+        case GLFW_KEY_2:
             KEY_VAL = 0x2;
             break;
 
-        case GLFW_KEY_4:
+        case GLFW_KEY_3:
             KEY_VAL = 0x3;
+            break;
+
+        case GLFW_KEY_4:
+            KEY_VAL = 0xC;
             break;
 
         case GLFW_KEY_Q:
@@ -203,35 +203,35 @@ key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
             break;
 
         case GLFW_KEY_R:
-            KEY_VAL = 0x7;
-            break;
-
-        case GLFW_KEY_A:
-            KEY_VAL = 0x8;
-            break;
-
-        case GLFW_KEY_S:
-            KEY_VAL = 0x9;
-            break;
-
-        case GLFW_KEY_D:
-            KEY_VAL = 0xA;
-            break;
-
-        case GLFW_KEY_F:
-            KEY_VAL = 0xB;
-            break;
-
-        case GLFW_KEY_Z:
-            KEY_VAL = 0xC;
-            break;
-
-        case GLFW_KEY_X:
             KEY_VAL = 0xD;
             break;
 
-        case GLFW_KEY_C:
+        case GLFW_KEY_A:
+            KEY_VAL = 0x7;
+            break;
+
+        case GLFW_KEY_S:
+            KEY_VAL = 0x8;
+            break;
+
+        case GLFW_KEY_D:
+            KEY_VAL = 0x9;
+            break;
+
+        case GLFW_KEY_F:
             KEY_VAL = 0xE;
+            break;
+
+        case GLFW_KEY_Z:
+            KEY_VAL = 0xA;
+            break;
+
+        case GLFW_KEY_X:
+            KEY_VAL = 0x0;
+            break;
+
+        case GLFW_KEY_C:
+            KEY_VAL = 0xB;
             break;
 
         case GLFW_KEY_V:

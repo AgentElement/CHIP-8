@@ -3,6 +3,50 @@
 
 #include "chip8.h"
 
+// int8_t keymap(char k)
+// {
+//     switch (k) {
+//     case '1':
+//         return 0x1;
+//     case '2':
+//         return 0x2;
+//     case '3':
+//         return 0x3;
+//     case '4':
+//         return 0xc;
+
+//     case 'q':
+//         return 0x4;
+//     case 'w':
+//         return 0x5;
+//     case 'e':
+//         return 0x6;
+//     case 'r':
+//         return 0xd;
+
+//     case 'a':
+//         return 0x7;
+//     case 's':
+//         return 0x8;
+//     case 'd':
+//         return 0x9;
+//     case 'f':
+//         return 0xe;
+
+//     case 'z':
+//         return 0xa;
+//     case 'x':
+//         return 0x0;
+//     case 'c':
+//         return 0xb;
+//     case 'v':
+//         return 0xf;
+
+//     default:
+//         return -1;
+//     }
+// }
+
 uint8_t sprites[80] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -178,18 +222,25 @@ int exec(chip8* c8, opcode inst)
             break;
 
         case (0x0A): { // FX0A: kld VX
-            uint8_t key = 255;
+            int8_t key = -1;
             for (size_t i = 0; i < 16; i++) {
                 if (c8->keyState[i]) {
                     key = i;
                     break;
                 }
             }
-            if (key != 255) {
+            if (key != -1) {
                 c8->V[byte_1] = key;
             } else {
                 goto End;
             }
+
+            // char key = fgetc(stdin);
+            // int index = keymap(key);
+
+            // if (index != -1) {
+            //     c8->V[byte_1] = index;
+            // }
         } break;
 
         case (0x15): // FX15: ld DT VX
@@ -209,19 +260,19 @@ int exec(chip8* c8, opcode inst)
             break;
 
         case (0x33): // FX55: bcd Vx
-            c8->memory[c8->I] = byte_1 / 100;
-            c8->memory[c8->I + 1] = byte_1 % 100;
-            c8->memory[c8->I + 2] = byte_1 % 10;
+            c8->memory[c8->I] = c8->V[byte_1] / 100;
+            c8->memory[c8->I + 1] = (c8->V[byte_1] / 10) % 10;
+            c8->memory[c8->I + 2] = c8->V[byte_1] % 10;
             break;
 
         case (0x55): // FX55: rdmp VX
-            for (uint8_t i = 0; i < byte_1; i++) {
+            for (uint8_t i = 0; i <= byte_1; i++) {
                 c8->memory[c8->I + i] = c8->V[i];
             }
             break;
 
         case (0x65): // FX65: rrcl VX
-            for (uint8_t i = 0; i < byte_1; i++) {
+            for (uint8_t i = 0; i <= byte_1; i++) {
                 c8->V[i] = c8->memory[c8->I + i];
             }
             break;

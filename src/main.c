@@ -3,7 +3,7 @@
 
 #include "sys/time.h"
 
-#define CLOCK_FREQ 60
+#define CLOCK_FREQ 200
 #define CLOCK_PERIOD (1000 / CLOCK_FREQ)
 
 void runGlWindow(chip8* machine);
@@ -13,7 +13,7 @@ void tick(chip8* machine);
 int main(int argc, char* argv[])
 {
     chip8 machine;
-    FILE* rom = fopen("roms/test.c8", "rb");
+    FILE* rom = fopen("roms/c8games/TICTAC", "rb");
     if (rom == NULL) {
         fprintf(stderr, "File does not exist\n");
         exit(1);
@@ -57,7 +57,7 @@ void runGlWindow(chip8* machine)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // glBindVertexArray(0);
 
     uint32_t shaderProgram = generateShaderProgram(
         "shaders/vertexshader.glsl",
@@ -66,7 +66,7 @@ void runGlWindow(chip8* machine)
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
 
         if (!(machine->DT > 0)) {
             tick(machine);
@@ -88,7 +88,7 @@ void runGlWindow(chip8* machine)
 
         glDrawElements(GL_TRIANGLES, ACTIVE_DISPLAY_PIXELS * 6, GL_UNSIGNED_INT, indices);
         // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
+        // glBindVertexArray(0);
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         glfwSwapBuffers(window);
@@ -113,13 +113,18 @@ void tick(chip8* machine)
         printf("%x ", machine->V[i]);
     }
     printf("\n");
-    printf("I: %x, SP: %x, PC: %x, DT: %x, Inst: %x, Mem: %x %x %x %x %x\n\n",
+    for (int i = 0; i < 16; i++) {
+        printf("%x ", machine->keyState[i]);
+    }
+    printf("\n");
+
+    printf("I: %x, SP: %x, PC: %x, DT: %x, Inst: %04x, Mem: %x %x %x %x %x\n\n",
         machine->I, machine->SP, machine->PC, machine->DT, inst,
         machine->memory[machine->I],
-        machine->memory[machine->I+1],
-        machine->memory[machine->I+2],
-        machine->memory[machine->I+3],
-        machine->memory[machine->I+4]
+        machine->memory[machine->I + 1],
+        machine->memory[machine->I + 2],
+        machine->memory[machine->I + 3],
+        machine->memory[machine->I + 4]
 
     );
 
@@ -127,9 +132,9 @@ void tick(chip8* machine)
         machine->keyState[KEY_VAL] = 1;
         key_change = 1;
 
-    } else if (KEY_VAL == -1 && key_change) {
+    } else if (KEY_VAL == -1) {
         for (int i = 0; i < 16; i++) {
-            machine->keyState[KEY_VAL] = 0;
+            machine->keyState[i] = 0;
         }
         key_change = 0;
     }

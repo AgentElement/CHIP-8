@@ -15,10 +15,13 @@ OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 $(ODIR)/%.o: $(SRC)/%.c
 	$(CC) -c $^ -o $@ $(CFLAGS)
 
-chip8test: $(OBJ)
+chip8: $(OBJ)
 	$(CC) $^ $(DEPS) -o $@ $(CFLAGS) $(LIBS)
+
+all:
+	chip8
 
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o chip8test	
+	rm -f $(ODIR)/*.o chip8
