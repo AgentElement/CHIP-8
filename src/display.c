@@ -82,19 +82,18 @@ void generateIndicesFromDisplay(uint8_t* display, uint32_t* indices)
 char* readShaderFile(char* filename)
 {
     char* buffer = 0;
-    long fLen;
-    FILE* f = fopen(filename, "rb");
+    FILE* file = fopen(filename, "rb");
 
-    if (f) {
-        fseek(f, 0, SEEK_END);
-        fLen = ftell(f);
-        fseek(f, 0, SEEK_SET);
-        buffer = malloc(fLen + 1);
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        uint64_t size = ftell(file);
+        rewind(file);
+        buffer = malloc(size + 1);
         if (buffer) {
-            fread(buffer, 1, fLen, f);
+            fread(buffer, 1, size, file);
         }
-        fclose(f);
-        buffer[fLen + 1] = '\0';
+        fclose(file);
+        buffer[size + 1] = '\0';
     }
     return buffer; // Must free buffer whenever used.
 }
