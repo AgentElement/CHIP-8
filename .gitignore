@@ -5,5 +5,5 @@ venv/
 *.o
 src/tests*
 *.json
-chip8test
+chip8
 roms/*
