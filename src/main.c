@@ -3,17 +3,24 @@
 
 #include "sys/time.h"
 
-#define CLOCK_FREQ 200
+#define CLOCK_FREQ 60
 #define CLOCK_PERIOD (1000 / CLOCK_FREQ)
 
 void runGlWindow(chip8* machine);
 
 void tick(chip8* machine);
 
+int timediff(struct timeval* now, struct timeval* prev)
+{
+    int difference = (now->tv_sec - prev->tv_sec) * 1000
+        + (now->tv_usec - prev->tv_usec) / 1000;
+    return difference;
+}
+
 int main(int argc, char* argv[])
 {
     chip8 machine;
-    FILE* rom = fopen("roms/c8games/TICTAC", "rb");
+    FILE* rom = fopen(argv[1], "rb");
     if (rom == NULL) {
         fprintf(stderr, "File does not exist\n");
         exit(1);
@@ -52,7 +59,7 @@ void runGlWindow(chip8* machine)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -62,10 +69,12 @@ void runGlWindow(chip8* machine)
     uint32_t shaderProgram = generateShaderProgram(
         "shaders/vertexshader.glsl",
         "shaders/fragmentshader.glsl");
+    glUseProgram(shaderProgram);
+
+    
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(shaderProgram);
         // glBindVertexArray(VAO);
 
         if (!(machine->DT > 0)) {
@@ -81,12 +90,13 @@ void runGlWindow(chip8* machine)
         struct timeval now;
         gettimeofday(&now, NULL);
 
-        if (((now.tv_sec - prev.tv_sec) * 1000 + (now.tv_usec - prev.tv_usec) / 1000) >= CLOCK_PERIOD) {
+        if (timediff(&now, &prev) >= CLOCK_PERIOD) {
             update_timers(machine);
             prev = now;
         }
 
         glDrawElements(GL_TRIANGLES, ACTIVE_DISPLAY_PIXELS * 6, GL_UNSIGNED_INT, indices);
+
         // glDrawArrays(GL_TRIANGLES, 0, 3);
         // glBindVertexArray(0);
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -101,14 +111,8 @@ void runGlWindow(chip8* machine)
     exit(EXIT_SUCCESS);
 }
 
-void tick(chip8* machine)
+void display_machine(chip8* machine, uint16_t inst)
 {
-    static uint8_t key_change;
-
-    uint16_t inst = (machine->memory[machine->PC] << 8)
-        | machine->memory[machine->PC + 1];
-    exec(machine, inst);
-
     for (int i = 0; i < 16; i++) {
         printf("%x ", machine->V[i]);
     }
@@ -127,6 +131,17 @@ void tick(chip8* machine)
         machine->memory[machine->I + 4]
 
     );
+}
+
+void tick(chip8* machine)
+{
+    static uint8_t key_change;
+
+    uint16_t inst = (machine->memory[machine->PC] << 8)
+        | machine->memory[machine->PC + 1];
+    exec(machine, inst);
+
+    display_machine(machine, inst);
 
     if (KEY_VAL != -1) {
         machine->keyState[KEY_VAL] = 1;
@@ -138,4 +153,5 @@ void tick(chip8* machine)
         }
         key_change = 0;
     }
+
 }
