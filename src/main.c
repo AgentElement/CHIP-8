@@ -64,25 +64,33 @@ void runGlWindow(chip8* machine)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    // glBindVertexArray(0);
 
     uint32_t shaderProgram = generateShaderProgram(
         "shaders/vertexshader.glsl",
         "shaders/fragmentshader.glsl");
     glUseProgram(shaderProgram);
 
-    
+    extern uint8_t SHOULD_REFRESH_DISPLAY_FLAG;
 
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        // glBindVertexArray(VAO);
 
-        if (!(machine->DT > 0)) {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // uint8_t isc = 0;
+
+        while (!(machine->DT > 0)) {
+            // glfwPollEvents();
             tick(machine);
             if (machine->DF) {
                 generateIndicesFromDisplay(machine->screen, indices);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
                 machine->DF = 0;
+                glfwPollEvents();
+                break;
+            }
+            glfwPollEvents();
+            if (glfwWindowShouldClose(window) || SHOULD_REFRESH_DISPLAY_FLAG) {
+                break;
             }
         }
 
@@ -94,16 +102,14 @@ void runGlWindow(chip8* machine)
             update_timers(machine);
             prev = now;
         }
-
         glDrawElements(GL_TRIANGLES, ACTIVE_DISPLAY_PIXELS * 6, GL_UNSIGNED_INT, indices);
 
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        // glBindVertexArray(0);
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
         glfwSwapBuffers(window);
+        if (SHOULD_REFRESH_DISPLAY_FLAG > 0) {
+            SHOULD_REFRESH_DISPLAY_FLAG--;
+        }
+
         glfwPollEvents();
-        // wait(1);
     }
 
     glfwDestroyWindow(window);
@@ -153,5 +159,4 @@ void tick(chip8* machine)
         }
         key_change = 0;
     }
-
 }

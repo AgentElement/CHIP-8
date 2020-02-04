@@ -1,4 +1,7 @@
 #include "display.h"
+
+uint8_t SHOULD_REFRESH_DISPLAY_FLAG = 0;
+
 GLFWwindow* createWindow()
 {
     glfwSetErrorCallback(error_callback);
@@ -29,7 +32,7 @@ GLFWwindow* createWindow()
         exit(EXIT_FAILURE);
     }
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set GL_COLOR_BUFFER_BIT
 
     return window;
@@ -247,5 +250,7 @@ static void
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // Change size of viewport when window is resized
 {
+    SHOULD_REFRESH_DISPLAY_FLAG = 4;
     glViewport(0, 0, width, height);
+
 }
