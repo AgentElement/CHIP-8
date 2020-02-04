@@ -4,6 +4,8 @@
 
 Compiles on linux. Make sure you have OpenGL support.
 
+Install [GLFW](https://www.glfw.org/) before you build.
+
 To build:
 
 ```make```
